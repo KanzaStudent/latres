@@ -1,6 +1,12 @@
+// ==============================================================================
+// FILE: lib/screens/register_screen.dart
+// DESKRIPSI: Halaman Pendaftaran Akun Pengguna Baru ke penyimpanan lokal.
+// ==============================================================================
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// Menggunakan StatefulWidget untuk mengelola controller input pendaftaran
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -9,13 +15,21 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  // Controller untuk membaca input Username pendaftar
   final _usernameController = TextEditingController();
+
+  // Controller untuk membaca input Password pendaftar
   final _passwordController = TextEditingController();
 
+  // ==========================================================================
+  // METHOD: _register()
+  // TUJUAN: Memvalidasi input dan menyimpan username & password ke SharedPreferences.
+  // ==========================================================================
   void _register() async {
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
 
+    // Validasi form: memastikan username dan password tidak boleh kosong
     if (username.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -23,13 +37,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
           backgroundColor: Colors.red,
         ),
       );
-      return;
+      return; // Berhenti jika tidak valid
     }
 
+    // Mendapatkan instance SharedPreferences lokal
     final prefs = await SharedPreferences.getInstance();
+
+    // Menyimpan kredensial pendaftaran ke key 'registered_username' dan 'registered_password'
     await prefs.setString('registered_username', username);
     await prefs.setString('registered_password', password);
 
+    // Memberitahu pengguna bahwa pendaftaran berhasil dan kembali ke halaman Login
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -37,10 +55,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
           backgroundColor: Colors.green,
         ),
       );
+      // Menutup halaman register dan kembali ke halaman LoginScreen sebelumnya
       Navigator.pop(context);
     }
   }
 
+  // Membersihkan resource controller saat widget dihancurkan
   @override
   void dispose() {
     _usernameController.dispose();
@@ -63,6 +83,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Judul formulir pendaftaran
               const Text(
                 'Daftar Akun Baru',
                 style: TextStyle(
@@ -72,6 +93,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
               const SizedBox(height: 28),
+
+              // Input TextField untuk nama akun baru
               TextField(
                 controller: _usernameController,
                 decoration: InputDecoration(
@@ -84,6 +107,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
               const SizedBox(height: 16),
+
+              // Input TextField untuk password baru (disamarkan)
               TextField(
                 controller: _passwordController,
                 obscureText: true,
@@ -97,6 +122,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
               const SizedBox(height: 24),
+
+              // Tombol untuk memicu pendaftaran akun
               ElevatedButton(
                 onPressed: _register,
                 style: ElevatedButton.styleFrom(
